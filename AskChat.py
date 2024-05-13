@@ -17,9 +17,7 @@ def askChat():
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
-    # ステップ
-    global step
-    global user_prompt
+
     
     AIChat_response = ""
     if (step == 0):

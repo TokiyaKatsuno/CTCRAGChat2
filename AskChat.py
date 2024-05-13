@@ -11,8 +11,8 @@ step = 0
 user_prompt = ""
 
 # ルートエンドポイントの作成
-@app.route('/')
-def index():
+@app.route('/AskChat')
+def askChat():
     return render_template('AskChat.html')
 
 @app.route('/api/chat', methods=['POST'])

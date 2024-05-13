@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ChatGPT Chat UI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .chat-box {
+            width: 100%;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .message {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        .message.user {
+            flex-direction: row-reverse;
+        }
+        .message-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin: 0 10px;
+        }
+        .message-bubble {
+            max-width: 70%;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: #f0f0f0;
+        }
+        .message.user .message-bubble {
+            background-color: #d4f4fa;
+        }
+        .input-container {
+            display: flex;
+            width: 100%;
+            margin: 20px auto 0;
+        }
+        #chat-input {
+            width: 100%;
+            margin-right: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        #send-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        #send-button:hover {
+            background-color: #45a049;
+        }
+    </style>    
+</head>
+<body>
+    <div class="chat-box" id="chat-box">
+        <div class="message bot">
+            <img src="https://via.placeholder.com/40x40?text=GPT" class="message-icon">
+            <div class="message-bubble">事象を教えてください。(以下の観点を参考に)　　誰が ／ 誰に ／ いつ ／ 何を ／ どうする ／ どうした</div>
+        </div>
+    </div>
+    <div style="display: flex; margin-top: 20px;">
+        <input type="text" id="chat-input" placeholder="こちらに入力してください..." autofocus>
+        <button onclick="sendMessage()">送る</button>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const inputElement = document.getElementById("chat-input");
+            const chatBox = document.getElementById("chat-box");
+            const userMessage = inputElement.value.trim();
+            if (!userMessage) return;
+
+            // ユーザーメッセージを表示
+            const userBubble = `
+                <div class="message user">
+                    <img src="https://via.placeholder.com/40x40?text=You" class="message-icon">
+                    <div class="message-bubble">${userMessage}</div>
+                </div>`;
+            chatBox.innerHTML += userBubble;
+            inputElement.value = "";
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // サーバーにリクエストを送信
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: userMessage })
+            });
+            const data = await response.json();
+
+            // ChatGPTからの応答を表示
+            const botBubble = `
+                <div class="message bot">
+                    <img src="https://via.placeholder.com/40x40?text=GPT" class="message-icon">
+                    <div class="message-bubble">${data.response}</div>
+                </div>`;
+            chatBox.innerHTML += botBubble;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+</body>
+</html>

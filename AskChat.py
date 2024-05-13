@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify
 import Common
 
 # Flaskアプリケーションを初期化
@@ -10,31 +10,22 @@ step = 0
 # プロンプトのグローバル変数
 user_prompt = ""
 
-# ルートエンドポイントの作成
-@app.route('/AskChat')
-def askChat():
-    return render_template('AskChat.html')
-
-@app.route('/api/chat', methods=['POST'])
-def chat():
+def addPrompt(user_input):
     global step
     global user_prompt
     
     AIChat_response = ""
     if (step == 0):
-        user_input = request.json.get('message', '')
         user_prompt += "##事象\n"
         user_prompt += user_input + "\n"
         AIChat_response = "次に背景を教えてください。(以下の観点を参考に)　現在の状況 ／ 確認・検討のきっかけ ／ 相手方の主張・理由 ／ 達成したいこと"
         step = 1
     elif (step == 1):
-        user_input = request.json.get('message', '')
         user_prompt += "##背景\n"
         user_prompt += user_input + "\n"
         AIChat_response = "関連する法令もしくは問題点・懸念点となりそうな規制や事項があれば教えてください。 "
         step = 2
     elif (step == 2):
-        user_input = request.json.get('message', '')
         user_prompt += "##懸念点\n"
         user_prompt += user_input + "\n"
         
@@ -77,7 +68,7 @@ def chat():
     # 改行をHTMLタグに変換
     AIChat_response_html = AIChat_response.replace("\n", r"<br \>")
 
-    return jsonify({'response': AIChat_response_html}), 200
+    return  AIChat_response_html
     
 # Run the Flask application
 if __name__ == '__main__':

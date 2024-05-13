@@ -3,6 +3,9 @@ from dotenv import load_dotenv
 from openai import AzureOpenAI
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+from janome.tokenizer import Tokenizer
+from nltk.translate.bleu_score import sentence_bleu
+from nltk.translate.bleu_score import SmoothingFunction
 
 # データベース接続パラメータ
 params = {
@@ -113,6 +116,17 @@ def insert_data(prompt, answer):
     except Exception as e:
         return str(e)
 
+def tokenize_japanese(text):
+    tokenizer = Tokenizer()
+    return [token.surface for token in tokenizer.tokenize(text)]
+
+def calculate_bleu_japanese(reference_texts, candidate_text):
+    references = [tokenize_japanese(ref) for ref in reference_texts]
+    candidate = tokenize_japanese(candidate_text)
+    smoothie = SmoothingFunction().method1
+    score = sentence_bleu(references, candidate, smoothing_function=smoothie)
+    return score
+
 # デバッグ用
 # vector = text2vector("Hello, how are you?")
 # print(vector)
@@ -125,3 +139,12 @@ def insert_data(prompt, answer):
 # response = LLM_chat(text)
 # print(response)
 
+# Example usage
+# reference_texts = [
+#     "これはテスト文です。",
+#     "これは別のテスト文です。"
+# ]
+# candidate_text = "これはテスト文でございます。"
+
+# bleu_score = calculate_bleu_japanese(reference_texts, candidate_text)
+# print(f"BLEU score: {bleu_score}")
